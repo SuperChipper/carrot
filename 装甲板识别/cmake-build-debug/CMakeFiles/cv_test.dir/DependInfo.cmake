@@ -8,8 +8,8 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
-  "/home/sad/桌面/armor/main.cpp" "CMakeFiles/cv_test.dir/main.cpp.o" "gcc" "CMakeFiles/cv_test.dir/main.cpp.o.d"
-  "/home/sad/桌面/armor/src/Detect.cpp" "CMakeFiles/cv_test.dir/src/Detect.cpp.o" "gcc" "CMakeFiles/cv_test.dir/src/Detect.cpp.o.d"
+  "/home/sad/桌面/public_mission/装甲板识别/main.cpp" "CMakeFiles/cv_test.dir/main.cpp.o" "gcc" "CMakeFiles/cv_test.dir/main.cpp.o.d"
+  "/home/sad/桌面/public_mission/装甲板识别/src/Detect.cpp" "CMakeFiles/cv_test.dir/src/Detect.cpp.o" "gcc" "CMakeFiles/cv_test.dir/src/Detect.cpp.o.d"
   )
 
 # Targets to which this target links.

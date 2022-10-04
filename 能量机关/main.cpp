@@ -18,9 +18,7 @@ int main(int argc,char const *argv[]){
         //}
         cv::imshow("img",wind.show);
         waitKey(20);
-        //for (auto &point:points) {
-            //wind.drawTetragon(img, points, Scalar(0, 255, 255));
-        //}
+        
     }
 
 }

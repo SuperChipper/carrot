@@ -1,6 +1,7 @@
 CMakeFiles/cv_test.dir/src/Detect.cpp.o: \
- /home/sad/桌面/armor/src/Detect.cpp /usr/include/stdc-predef.h \
- /home/sad/桌面/armor/include/Detect.h \
+ /home/sad/桌面/public_mission/装甲板识别/src/Detect.cpp \
+ /usr/include/stdc-predef.h \
+ /home/sad/桌面/public_mission/装甲板识别/include/Detect.h \
  /usr/local/include/opencv4/opencv2/opencv.hpp \
  /usr/local/include/opencv4/opencv2/opencv_modules.hpp \
  /usr/local/include/opencv4/opencv2/core.hpp \

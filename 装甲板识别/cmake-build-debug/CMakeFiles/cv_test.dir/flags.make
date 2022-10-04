@@ -4,7 +4,7 @@
 # compile CXX with /usr/bin/c++
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I/home/sad/桌面/armor/include -isystem /usr/local/include/opencv4
+CXX_INCLUDES = -I/home/sad/桌面/public_mission/装甲板识别/include -isystem /usr/local/include/opencv4
 
 CXX_FLAGS = -g -std=gnu++14
 

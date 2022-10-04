@@ -1,4 +1,4 @@
-# Install script for directory: /home/sad/桌面/armor
+# Install script for directory: /home/sad/桌面/public_mission/装甲板识别
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -50,5 +50,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/home/sad/桌面/armor/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/home/sad/桌面/public_mission/装甲板识别/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")
