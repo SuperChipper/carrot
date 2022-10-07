@@ -1,12 +1,12 @@
-//
-// Created by zihan on 22-7-9.
-//
 /**
- *
  * @file Detect.h
- * @author 林梓涵
+ * @author 林梓涵 (1625703948@qq.com)
+ * @brief 
  * @version 1.0
- * @date 2022.7.14
+ * @date 2022-10-04
+ * 
+ * @copyright Copyright (c) 2022
+ * 
  */
 #ifndef DETECT_H
 #define DETECT_H

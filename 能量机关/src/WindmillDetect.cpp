@@ -1,22 +1,27 @@
 #include "WindmillDetect.h"
 
-using std::vector;
 using cv::Point;
-
-void WindmillDetect::drawTetragon(cv::Mat &image, cv::Point2f *vertices, const cv::Scalar &color)  {
+using std::vector;
+using namespace cv;
+void WindmillDetect::drawTetragon(cv::Mat &image, cv::Point2f *vertices, const cv::Scalar &color)
+{
     using cv::Scalar;
     int thickness = (int)ceil(5e-3 * image.cols);
-    for (int j = 0; j < 4; j++) {
+    for (int j = 0; j < 4; j++)
+    {
         cv::line(image, vertices[j], vertices[(j + 1) % 4], color, thickness);
     }
     int radius = (int)ceil(1e-2 * image.cols);
-    //cv::circle(image, vertices[0], radius, Scalar(  0,   0, 255), -1); // red
-    //cv::circle(image, vertices[1], radius, Scalar(  0, 255, 255), -1); // yellow
-    //cv::circle(image, vertices[2], radius, Scalar(255,   0, 255), -1); // purple / violet
-    //cv::circle(image, vertices[3], radius, Scalar(255,   0,   0), -1); // blue
+    // cv::circle(image, vertices[0], radius, Scalar(  0,   0, 255), -1); // red
+    // cv::circle(image, vertices[1], radius, Scalar(  0, 255, 255), -1); // yellow
+    // cv::circle(image, vertices[2], radius, Scalar(255,   0, 255), -1); // purple / violet
+    // cv::circle(image, vertices[3], radius, Scalar(255,   0,   0), -1); // blue
 }
 
-std::vector<cv::Point2f> WindmillDetect::process(const cv::Mat &frame) {
+std::vector<cv::Point2f> WindmillDetect::process(const cv::Mat &frame)
+{
+    RotatedRect lastcen;
+    bool founded = false;
 
     std::vector<cv::Mat> channels;
 
@@ -28,34 +33,48 @@ std::vector<cv::Point2f> WindmillDetect::process(const cv::Mat &frame) {
     dilate(binary, binary, element);
 
     vector<vector<Point>> contours;
-    //vector<Vec4i> hierarchy;
+    // vector<Vec4i> hierarchy;
     cv::findContours(binary, contours, cv::RETR_LIST, cv::CHAIN_APPROX_SIMPLE);
+    imshow("bin", binary);
 
-    if (this->draw_result) {
+    if (this->draw_result)
+    {
         frame.copyTo(show);
     }
 
     auto frame_area = frame.cols * frame.rows;
 
-    //cv::Point2f vertices[4];
+    // cv::Point2f vertices[4];
 
     vector<cv::RotatedRect> rrects;
     vector<double> rrect_sizes;
-    for (auto & c : contours) {
+    for (auto &c : contours)
+    {
         auto r = minAreaRect(c);
         rrect_sizes.push_back(r.size.width * r.size.height);
         rrects.push_back(r);
     }
 
     std::vector<cv::Point2f> aimArea;
-
+    RotatedRect center;
     bool found_fan = false;
-    for (int i = 0; i < contours.size(); ++i) {
+    bool found_cen = false;
+    Point2f pos;
+    for (int i = 0; i < contours.size(); ++i)
+    {
 
         auto rrect = rrects[i];
 
         auto area = rrect_sizes[i];
-        if (area < 1e-3 * frame_area || area > 8e-2 * frame_area) continue;
+        if (area < 3e-3 * frame_area &&
+            (rrect.size.width > 0.7 * rrect.size.height && rrect.size.height > 0.7 * rrect.size.width) && ((abs(rrect.angle) < 12) || (abs(rrect.angle - 90) < 12)))
+        {
+            center = rrect;
+            if (center.center.x && center.center.y)
+                found_cen = true;
+        }
+        if (area < 1e-3 * frame_area || area > 8e-2 * frame_area)
+            continue;
 
         double hu_moments[7];
         HuMoments(moments(contours[i]), hu_moments);
@@ -69,32 +88,44 @@ std::vector<cv::Point2f> WindmillDetect::process(const cv::Mat &frame) {
 
         const double max_diff = 0.15; // Max diff allowed for myDistance
 
-        if (d1 < max_diff && d2 > max_diff) {
+        if (d1 < max_diff && d2 > max_diff)
+        {
             found_fan = true;
             // std::cout << "-> to_hit  " << "Contour area: " << area << "\n";
-        } else {
+        }
+        else
+        {
             found_fan = false;
             // std::cout << "-> others  " << "Contour area: " << area << "\n";
         }
 
-        //if (this->draw_result) {
-            //cv::Point2f srcPt[4];
-            //rrect.points(srcPt);
-            //drawTetragon(show, srcPt, cv::Scalar(238, 165, 65));
-        //}
+        if (this->draw_result)
+        {
+            cv::Point2f srcPt[4];
+            rrect.points(srcPt);
+            drawTetragon(show, srcPt, cv::Scalar(238, 165, 65));
+        }
 
-        if (found_fan) {
-            for (int j = 0; j < contours.size(); ++j) {
-                if (rrect_sizes[j] > 0.3 * area || rrect_sizes[j] < 0.08 * area) continue;
+        if (found_fan)
+        {
+            founded = true;
+            for (int j = 0; j < contours.size(); ++j)
+            {
+                if (rrect_sizes[j] > 0.3 * area || rrect_sizes[j] < 0.08 * area)
+                    continue;
                 std::vector<cv::Point2f> vertices;
-                if (rotatedRectangleIntersection(rrects[j], rrects[i], vertices) == cv::INTERSECT_FULL) {
+                if (rotatedRectangleIntersection(rrects[j], rrects[i], vertices) == cv::INTERSECT_FULL)
+                {
                     cv::Point2f pts[4];
                     rrects[j].points(pts);
-                    
-                    if (this->draw_result) {
-                        cv::Point2f pos = (((pts[0] + pts[2]) / 2) + ((pts[1] + pts[3]) / 2)) / 2;
-                        cv::circle(show, pos, 5, cv::Scalar(0,0,255));
-                        drawTetragon(show, pts, cv::Scalar(255,255,255));
+                    // rrects[j].angle;
+
+                    if (this->draw_result)
+                    {
+                        pos = (((pts[0] + pts[2]) / 2) + ((pts[1] + pts[3]) / 2)) / 2;
+                        cv::circle(show, pos, 4, cv::Scalar(120, 40, 255), 3);
+
+                        drawTetragon(show, pts, cv::Scalar(255, 255, 255));
                     }
 
                     aimArea = {pts[0], pts[1], pts[2], pts[3]};
@@ -102,7 +133,21 @@ std::vector<cv::Point2f> WindmillDetect::process(const cv::Mat &frame) {
                 }
             }
         }
+        if (found_cen==true && founded==true)
+        {
+            double angle = atan((center.center.x - pos.x) / (center.center.y - pos.y + 1e-6));
+            // angle=angle+M_PI;
+            // if(angle>2*M_PI)
+            // angle-=2*M_PI;
+            angle /= M_PI / 180;
+            if (center.center.y >= pos.y)
+                angle += 90;
+            else
+                angle += 270;
 
+            line(show, center.center, pos, Scalar(255, 255, 255), 2);
+            putText(show, "Angle: " + std::to_string(angle), pos, FONT_HERSHEY_PLAIN, 1, Scalar(255, 255, 255));
+        }
 
         /* // Show Fan; can be used for preparing image for SVM training
         int height = rrect.size.height;

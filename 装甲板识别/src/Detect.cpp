@@ -1,12 +1,12 @@
 /**
  * @file Detect.cpp
  * @author 林梓涵 (1625703948@qq.com)
- * @brief
+ * @brief 
  * @version 1.0
  * @date 2022-10-04
- *
+ * 
  * @copyright Copyright (c) 2022
- *
+ * 
  */
 #include "Detect.h"
 
@@ -386,9 +386,9 @@ pnp_sol::pnp_sol(Rrect rec, Mat image)
         prt1 += to_string(temp)+" m";
     }
     vector<string> prt;
-    prt.push_back("x:" + to_string(angles[0]));
-    prt.push_back("y:" + to_string(angles[1]));
-    prt.push_back("z:" + to_string(angles[2]));
+    prt.push_back("alpha:" + to_string(angles[0]));
+    prt.push_back("beta:" + to_string(angles[1]));
+    prt.push_back("gamma:" + to_string(angles[2]));
     // cout<<prt<<endl;
     int baseline;
     

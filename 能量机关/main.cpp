@@ -12,12 +12,9 @@ int main(int argc,char const *argv[]){
             break;
 
         vector<cv::Point2f> points=wind.process(img);
-        //cout<<points;
-        //for(Point2f &point:points.begin();points.end()){
-        //    wind.drawTetragon(img, point, Scalar(0, 255, 255));
-        //}
+
         cv::imshow("img",wind.show);
-        waitKey(20);
+        waitKey(60);
         
     }
 
