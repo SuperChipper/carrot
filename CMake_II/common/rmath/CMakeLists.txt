@@ -1,0 +1,5 @@
+#find_package(OpenCV REQUIRED)
+aux_source_directory(src RMATH_DIRS)
+add_library(rmath SHARED ${RMATH_DIRS})
+target_include_directories(rmath PUBLIC include)
+target_link_libraries(rmath ${OpenCV_LIBS})
