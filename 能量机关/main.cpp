@@ -1,4 +1,3 @@
-
 #include "WindmillDetect.h"
 using namespace std;
 using namespace cv;

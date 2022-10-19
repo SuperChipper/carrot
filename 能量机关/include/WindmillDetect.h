@@ -7,12 +7,14 @@
 #include <opencv2/opencv.hpp>
 #include <vector>
 #include <opencv2/highgui.hpp>
+#include "Kalmanfilter.h"
 
 class WindmillDetect
 {
 private:
+    double lastangle = 0;
     cv::Mat element;
-
+    filterKF kfcv;
     // 距离会导致二值图的变化，根据距离需要改变是否开运算，最后需要修改图像矩
     double to_hit_hu_moments[7] = {
         0.34038, 0.05055, 0.03539, 0.01653, 0.000166, 0.00350, 0};
@@ -46,6 +48,5 @@ public:
     static void drawTetragon(cv::Mat &image, cv::Point2f *vertices, const cv::Scalar &color);
 };
 cv::Point2f *point2f_convert(cv::RotatedRect rrect);
-
 
 #endif // MUC_CLEMENTINE_WINDMILLDETECT_H

@@ -1,3 +1,13 @@
+/**
+ * @file WindmillDetect.cpp
+ * @author 林梓涵 (1625703948@qq.com)
+ * @brief
+ * @version 1.0
+ * @date 2022-10-19
+ *
+ * @copyright Copyright (c) 2022
+ *
+ */
 #include "WindmillDetect.h"
 
 using cv::Point;
@@ -5,6 +15,7 @@ using std::vector;
 using namespace cv;
 void WindmillDetect::drawTetragon(cv::Mat &image, cv::Point2f *vertices, const cv::Scalar &color)
 {
+
     using cv::Scalar;
     int thickness = (int)ceil(5e-3 * image.cols);
     for (int j = 0; j < 4; j++)
@@ -60,6 +71,7 @@ std::vector<cv::Point2f> WindmillDetect::process(const cv::Mat &frame)
     bool found_fan = false;
     bool found_cen = false;
     Point2f pos;
+    
     for (int i = 0; i < contours.size(); ++i)
     {
 
@@ -99,12 +111,12 @@ std::vector<cv::Point2f> WindmillDetect::process(const cv::Mat &frame)
             // std::cout << "-> others  " << "Contour area: " << area << "\n";
         }
 
-        if (this->draw_result)
-        {
-            cv::Point2f srcPt[4];
-            rrect.points(srcPt);
-            drawTetragon(show, srcPt, cv::Scalar(238, 165, 65));
-        }
+        //if (this->draw_result)
+        //{
+            //cv::Point2f srcPt[4];
+            //rrect.points(srcPt);
+            //drawTetragon(show, srcPt, cv::Scalar(238, 165, 65));
+        //}
 
         if (found_fan)
         {
@@ -123,7 +135,8 @@ std::vector<cv::Point2f> WindmillDetect::process(const cv::Mat &frame)
                     if (this->draw_result)
                     {
                         pos = (((pts[0] + pts[2]) / 2) + ((pts[1] + pts[3]) / 2)) / 2;
-                        cv::circle(show, pos, 4, cv::Scalar(120, 40, 255), 3);
+
+                        cv::circle(show, pos, 3, cv::Scalar(120, 40, 255), 3);
 
                         drawTetragon(show, pts, cv::Scalar(255, 255, 255));
                     }
@@ -133,7 +146,8 @@ std::vector<cv::Point2f> WindmillDetect::process(const cv::Mat &frame)
                 }
             }
         }
-        if (found_cen==true && founded==true)
+        //绘制中心和装甲板连线
+        if (found_cen == true && founded == true)
         {
             double angle = atan((center.center.x - pos.x) / (center.center.y - pos.y + 1e-6));
             // angle=angle+M_PI;
@@ -144,9 +158,25 @@ std::vector<cv::Point2f> WindmillDetect::process(const cv::Mat &frame)
                 angle += 90;
             else
                 angle += 270;
-
+            if (abs(angle - lastangle) < 12||abs(angle - lastangle-360) <10)
+            {
+                Mat pd = kfcv.predict(pos - center.center);
+                Point2f predict;
+                predict.x = pd.at<float>(0);
+                predict.y = pd.at<float>(1);
+                cv::circle(show, pos+1*(pos-predict -center.center), 4, cv::Scalar(250, 130, 215), 4);
+            }
+            else
+            {
+                filterKF newkf;
+                kfcv = newkf;
+                kfcv.set_state(pos - center.center);
+                //kfcv.predict(pos - center.center);
+           }
+            lastangle = angle;
             line(show, center.center, pos, Scalar(255, 255, 255), 2);
             putText(show, "Angle: " + std::to_string(angle), pos, FONT_HERSHEY_PLAIN, 1, Scalar(255, 255, 255));
+            
         }
 
         /* // Show Fan; can be used for preparing image for SVM training
