@@ -136,7 +136,7 @@ std::vector<cv::Point2f> WindmillDetect::process(const cv::Mat &frame)
                     {
                         pos = (((pts[0] + pts[2]) / 2) + ((pts[1] + pts[3]) / 2)) / 2;
 
-                        cv::circle(show, pos, 3, cv::Scalar(120, 40, 255), 3);
+                        cv::circle(show, pos, 2, cv::Scalar(120, 40, 255), 2);
 
                         drawTetragon(show, pts, cv::Scalar(255, 255, 255));
                     }
@@ -147,8 +147,9 @@ std::vector<cv::Point2f> WindmillDetect::process(const cv::Mat &frame)
             }
         }
         //绘制中心和装甲板连线
-        if (found_cen == true && founded == true)
+        if (found_cen == true && founded == true&&pos.x>20&&pos.y>20)
         {
+            //std::cout<<center.center.y<<"  "<<center.center.x<<std::endl;
             double angle = atan((center.center.x - pos.x) / (center.center.y - pos.y + 1e-6));
             // angle=angle+M_PI;
             // if(angle>2*M_PI)
@@ -158,19 +159,20 @@ std::vector<cv::Point2f> WindmillDetect::process(const cv::Mat &frame)
                 angle += 90;
             else
                 angle += 270;
-            if (abs(angle - lastangle) < 12||abs(angle - lastangle-360) <10)
+            if (abs(angle - lastangle) < 12||abs(angle - lastangle-360) <12)
             {
                 Mat pd = kfcv.predict(pos - center.center);
                 Point2f predict;
                 predict.x = pd.at<float>(0);
                 predict.y = pd.at<float>(1);
-                cv::circle(show, pos+1*(pos-predict -center.center), 4, cv::Scalar(250, 130, 215), 4);
+                //cv::circle(show, predict +center.center, 2, cv::Scalar(255, 100, 0), 2);
+                cv::circle(show, pos+predict, 2, cv::Scalar(250, 255, 215), 3);
             }
             else
             {
-                filterKF newkf;
-                kfcv = newkf;
-                kfcv.set_state(pos - center.center);
+                //filterKF newkf;
+                //kfcv = newkf;
+                kfcv.set_state(pos - center.center);//更改statePost
                 //kfcv.predict(pos - center.center);
            }
             lastangle = angle;

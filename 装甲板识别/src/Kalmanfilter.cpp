@@ -23,8 +23,8 @@ filterKF::filterKF()
                            0, 0, 0, 1);
     //这里没有设置控制矩阵B，默认为零
     setIdentity(KF.measurementMatrix);                      // H=[1,0,0,0;0,1,0,0] 测量矩阵
-    setIdentity(KF.processNoiseCov, Scalar::all(1e-4));     // 过程误差，Q高斯白噪声，单位阵
-    setIdentity(KF.measurementNoiseCov, Scalar::all(8e-1)); // 测量误差，R高斯白噪声，单位阵
+    setIdentity(KF.processNoiseCov, Scalar::all(1e-5));     // 过程误差，Q高斯白噪声，单位阵
+    setIdentity(KF.measurementNoiseCov, Scalar::all(8e-3)); // 测量误差，R高斯白噪声，单位阵
     setIdentity(KF.errorCovPost, Scalar::all(1));           // P后验误差估计协方差矩阵，初始化为单位阵
     randn(KF.statePost, Scalar::all(0), Scalar::all(0.1));  //初始化状态为随机值
     

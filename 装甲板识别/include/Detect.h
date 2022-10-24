@@ -14,7 +14,7 @@
 #include <vector>
 #include <iostream>
 #include <cmath>
-
+#include  "Kalmanfilter.h"
 //#include <opencv2/highgui.hpp>
 //#include <opencv2/calib3d.hpp>
 
@@ -75,7 +75,7 @@ public:
     //转换到三维
     Rrect(vector<vector<Point>> contour);
     //寻找最小外接矩形
-    void find(Detect);
+    void find(Detect,filterKF);
     //在矩形中找到装甲板并绘制
     void draw_side(RotatedRect, Mat);
     //绘制矩形角点
@@ -86,7 +86,7 @@ struct rec_size;
 
 rec_size adjust_size(RotatedRect);
 
-void Detector(Mat); //检测图像
+void Detector(Mat,filterKF); //检测图像
 
 void Detect_target(string, string, int); //根据文件类型调用检测函数
 

@@ -9,7 +9,7 @@
  * 
  */
 #include "Detect.h"
-
+//#include "Kalmanfilter.h"
 /**
  *
  * @param frame 传入图像帧
@@ -21,7 +21,7 @@ struct rec_size
 };
 Detect::Detect(Mat frame)
 {
-
+    //Kalman=KF;
     const Mat _struct = getStructuringElement(1, Size(3, 3));
     _image = frame;
     split(_image, RGBchannels);
@@ -140,7 +140,7 @@ void Detect::Draw_rect(RotatedRect rrect)
  * @brief 图像检测函数封装
  *
  */
-void Detector(Mat img)
+void Detector(Mat img,filterKF KF)
 {
     // namedWindow("img", WINDOW_FREERATIO);
     // namedWindow("bin", WINDOW_FREERATIO);
@@ -152,7 +152,7 @@ void Detector(Mat img)
     findContours(bin, contour, hierarchy1, RETR_TREE, CHAIN_APPROX_SIMPLE);
     vector<RotatedRect> rrect;
     Rrect rec(contour);
-    rec.find(image);
+    rec.find(image,KF);
     pnp_sol p(rec, image.Get());
 
     // cv_bridge::CvImageConstPtr toCvShare(const sensor_msgs::ImageConstPtr& source,
@@ -171,6 +171,7 @@ void Detector(Mat img)
  */
 void Detect_target(string type, string path, int waitkey)
 {
+    filterKF KF;
     Mat img;
     if (type == "video")
     {
@@ -182,7 +183,7 @@ void Detect_target(string type, string path, int waitkey)
             {
                 break;
             }
-            Detector(img);
+            Detector(img,KF);
             waitKey(waitkey);
         }
     }
@@ -191,7 +192,7 @@ void Detect_target(string type, string path, int waitkey)
         img = imread(path);
         if (!img.empty())
         {
-            Detector(img);
+            Detector(img,KF);
             waitKey(waitkey);
         }
     }
@@ -246,7 +247,7 @@ rec_size adjust_size(RotatedRect rect)
  *
  * @param image 传入Detect类进行筛选
  */
-void Rrect::find(Detect image)
+void Rrect::find(Detect image,filterKF KF)
 {
     for (auto &rec : rrect)
     {
@@ -267,8 +268,10 @@ void Rrect::find(Detect image)
                     if ((size1.width > 0.6 * size2.width) && (0.6 * size1.width < size2.width))
                     {
                         line(image.Get(), ptr, rec.center, Scalar(100, 200, 255), 2, 8, 0);
-                        ;
                         circle(image.Get(), (rec.center + ptr) / 2, 2, Scalar(255, 20, 255), 2, 8, 0);
+                        Mat prediction=KF.predict((rec.center + ptr) / 2);
+                        Point2f predictionPoint(prediction.at<float>(0),prediction.at<float>(1));
+                        circle(image.Get(), (rec.center + ptr) / 2+predictionPoint, 2, Scalar(255, 255, 255), 2, 8, 0);
                         draw_side(cri, image.Get());
                         draw_side(rec, image.Get());
                         armor.push_back((rec.center + ptr) / 2);
@@ -348,7 +351,7 @@ void Rrect::draw_side(RotatedRect rect, Mat image)
     center.z = 0;
 }
 template <typename _tp>
-vector<_tp> convertMat2Vec(const Mat &a)
+inline vector<_tp> convertMat2Vec(const Mat &a)//类型转换
 {
     return (vector<_tp>)(a.reshape(1, 1));
 }
@@ -376,7 +379,7 @@ pnp_sol::pnp_sol(Rrect rec, Mat image)
     // cout<<img_points[0]<<"\t"<<((Get_rotate().t())*tvecs).row(2)<<endl;
     // double out=((Get_rotate().t())*tvecs);
     //((Get_rotate().t())*tvecs).col();
-    double font_sz=1.5;
+    double font_sz=1.5;//在图像上显示距离和欧拉角
     Mat a = 0.001 * ((Get_rotate().t()) * tvecs).row(2);
     // string prt = "";
     string prt0= "distance:",prt1="";
